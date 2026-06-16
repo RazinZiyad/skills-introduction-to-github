@@ -8,7 +8,7 @@ import yaml
 import pytest
 from pathlib import Path
 
-from conftest import WORKFLOWS_DIR, REPO_ROOT
+from tests.helpers import WORKFLOWS_DIR, REPO_ROOT
 
 
 COURSE_WORKFLOWS = [

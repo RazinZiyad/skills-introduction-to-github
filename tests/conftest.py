@@ -1,14 +1,9 @@
 """Shared fixtures for the test suite."""
 
-import os
-from pathlib import Path
-
 import pytest
 import yaml
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
-WORKFLOWS_DIR = REPO_ROOT / ".github" / "workflows"
-STEPS_DIR = REPO_ROOT / ".github" / "steps"
+from tests.helpers import REPO_ROOT, WORKFLOWS_DIR, STEPS_DIR
 
 
 @pytest.fixture

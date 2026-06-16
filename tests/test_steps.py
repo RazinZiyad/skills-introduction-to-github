@@ -7,7 +7,7 @@ and are consistent with the workflow definitions.
 import pytest
 from pathlib import Path
 
-from conftest import STEPS_DIR, REPO_ROOT
+from tests.helpers import STEPS_DIR, REPO_ROOT
 
 
 EXPECTED_STEP_FILES = [

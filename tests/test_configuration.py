@@ -8,7 +8,7 @@ import yaml
 import pytest
 from pathlib import Path
 
-from conftest import REPO_ROOT
+from tests.helpers import REPO_ROOT
 
 
 class TestDependabotConfig:

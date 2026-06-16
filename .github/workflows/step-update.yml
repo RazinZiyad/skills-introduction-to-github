@@ -1,0 +1,76 @@
+name: Reusable Step Update
+
+# Shared workflow that encapsulates the duplicated get_current_step + update
+# pattern used by every course step workflow.
+
+on:
+  workflow_call:
+    inputs:
+      expected_step:
+        description: 'The step number the learner should currently be on'
+        required: true
+        type: string
+      to_step:
+        description: 'The step number to advance to'
+        required: true
+        type: string
+      branch_name:
+        description: 'The branch to update'
+        required: false
+        type: string
+        default: 'my-first-branch'
+      ref:
+        description: 'Git ref to checkout (leave empty for default)'
+        required: false
+        type: string
+        default: ''
+
+# Reference: https://docs.github.com/en/actions/security-guides/automatic-token-authentication
+permissions:
+  # Need `contents: read` to checkout the repository.
+  # Need `contents: write` to update the step metadata.
+  contents: write
+
+jobs:
+  get_current_step:
+    name: Check current step number
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - id: get_step
+        run: |
+          echo "current_step=$(cat ./.github/steps/-step.txt)" >> $GITHUB_OUTPUT
+    outputs:
+      current_step: ${{ steps.get_step.outputs.current_step }}
+
+  update_step:
+    name: Update to step ${{ inputs.to_step }}
+    needs: get_current_step
+
+    # We will only run this action when:
+    # 1. This repository isn't the template repository.
+    # 2. The step matches the expected value.
+    # Reference: https://docs.github.com/en/actions/learn-github-actions/contexts
+    # Reference: https://docs.github.com/en/actions/learn-github-actions/expressions
+    if: >-
+      ${{ !github.event.repository.is_template
+          && needs.get_current_step.outputs.current_step == inputs.expected_step }}
+
+    # We'll run Ubuntu for performance instead of Mac or Windows.
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Let's get all the branches.
+          ref: ${{ inputs.ref }}
+
+      - name: Update step
+        uses: skills/action-update-step@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          from_step: ${{ inputs.expected_step }}
+          to_step: ${{ inputs.to_step }}
+          branch_name: ${{ inputs.branch_name }}

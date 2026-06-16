@@ -1,0 +1,40 @@
+"""Shared fixtures for the test suite."""
+
+import pytest
+import yaml
+
+from tests.helpers import REPO_ROOT, WORKFLOWS_DIR, STEPS_DIR
+
+
+@pytest.fixture
+def repo_root():
+    return REPO_ROOT
+
+
+@pytest.fixture
+def workflows_dir():
+    return WORKFLOWS_DIR
+
+
+@pytest.fixture
+def steps_dir():
+    return STEPS_DIR
+
+
+@pytest.fixture
+def workflow_files():
+    """Return a dict of workflow filename -> parsed YAML content."""
+    workflows = {}
+    for f in sorted(WORKFLOWS_DIR.glob("*.yml")):
+        with open(f) as fh:
+            workflows[f.name] = yaml.safe_load(fh)
+    return workflows
+
+
+@pytest.fixture
+def step_files():
+    """Return a dict of step filename -> content."""
+    steps = {}
+    for f in sorted(STEPS_DIR.iterdir()):
+        steps[f.name] = f.read_text()
+    return steps
